@@ -1,0 +1,1 @@
+{\"version\": 2, \"builds\": [{\"src\": \"ultimate_assistant/api.py\", \"use\": \"@vercel/python\"}], \"routes\": [{\"src\": \"/(.*)\", \"dest\": \"ultimate_assistant/api.py\"}]}

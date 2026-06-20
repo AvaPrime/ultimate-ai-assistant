@@ -1,0 +1,1 @@
+fastapi\nuvicorn\njinja2\nhttpx\nlangchain\nlangchain-xai\nxai-sdk\ngoogle-generativeai\ndeep-translator\npython-dotenv\nlangdetect
