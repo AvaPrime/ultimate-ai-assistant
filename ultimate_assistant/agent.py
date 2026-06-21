@@ -1,7 +1,7 @@
 from langchain_openai import ChatOpenAI
 from langchain.agents import create_react_agent, AgentExecutor
 from langchain_core.prompts import ChatPromptTemplate
-from .tools import research, generate_image, analyze_image
+from .tools import research, generate_image, analyze_image, send_email, add_to_notion_database
 from .config import config
 
 def create_agent():
@@ -15,6 +15,6 @@ def create_agent():
             "X-Title": "Ultimate AI Assistant"
         }
     )
-    tools = [research, generate_image, analyze_image]
+    tools = [research, generate_image, analyze_image, send_email, add_to_notion_database]
     agent = create_react_agent(llm, tools)
     return AgentExecutor(agent=agent, tools=tools, verbose=False, handle_parsing_errors=True)
