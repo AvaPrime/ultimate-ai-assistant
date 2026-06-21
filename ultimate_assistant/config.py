@@ -12,7 +12,11 @@ class Config:
     gemini_key: str = os.getenv("GEMINI_API_KEY")
     openai_key: str = os.getenv("OPENAI_API_KEY")
     eleven_key: str = os.getenv("ELEVEN_API_KEY")
-    model: str = "openai/gpt-4o"          # Change to any model on OpenRouter
+    resend_key: str = os.getenv("RESEND_API_KEY")  # For email tool
+    notion_key: str = os.getenv("NOTION_API_KEY")    # For Notion tool
+    redis_url: str = os.getenv("REDIS_URL") or os.getenv("UPSTASH_REDIS_URL")
+    access_password: str = os.getenv("ACCESS_PASSWORD")  # Optional shared password
+    model: str = "openai/gpt-4o"
     temperature: float = 0.4
 
 config = Config()
