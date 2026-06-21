@@ -21,7 +21,16 @@
 </head>
 <body>
   <h1>Ultimate AI Assistant</h1>
+
   <div style="margin-bottom:12px; display:flex; gap:12px; flex-wrap:wrap;">
+    <div>
+      <label>Model:</label><br>
+      <select id="model">
+        {% for m in models %}
+        <option value="{{ m.id }}">{{ m.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
     <div>
       <label>Voice:</label><br>
       <select id="voice">
@@ -38,7 +47,7 @@
       <input type="range" id="speed" min="0.5" max="2" step="0.1" value="1">
     </div>
     <div>
-      <label>Password (if required):</label><br>
+      <label>Password:</label><br>
       <input id="password" type="password" placeholder="Optional" style="width:140px;">
     </div>
   </div>
@@ -46,10 +55,11 @@
   <div id="chat"></div>
 
   <div class="controls">
-    <button id="mic">🎤 Mic</button>
+    <button id="mic">Mic</button>
     <input id="input" placeholder="Type or speak..." style="flex:1; min-width:200px;">
     <button onclick="send()">Send</button>
-    <button onclick="exportChat()">Export Chat</button>
+    <button onclick="loadHistory()">Load History</button>
+    <button onclick="exportChat()">Export</button>
   </div>
 
   <audio id="player" autoplay></audio>
@@ -61,6 +71,7 @@
   const speedSlider = document.getElementById('speed');
   const speedVal = document.getElementById('speedVal');
   const voiceSelect = document.getElementById('voice');
+  const modelSelect = document.getElementById('model');
   const player = document.getElementById('player');
   const passwordInput = document.getElementById('password');
 
@@ -78,7 +89,7 @@
     mediaRecorder = new MediaRecorder(stream);
     mediaRecorder.ondataavailable = e => chunks.push(e.data);
     mediaRecorder.onstop = async () => {
-      micBtn.textContent = '🎤 Mic'; micBtn.classList.remove('recording');
+      micBtn.textContent = 'Mic'; micBtn.classList.remove('recording');
       const blob = new Blob(chunks, { type: 'audio/webm' });
       const reader = new FileReader();
       reader.onload = async () => {
@@ -102,6 +113,7 @@
       query,
       speed: parseFloat(speedSlider.value),
       voice: voiceSelect.value,
+      model: modelSelect.value,
       session: sessionId,
       password: passwordInput.value || null
     };
@@ -144,6 +156,24 @@
       }
       chat.scrollTop = chat.scrollHeight;
     }
+  }
+
+  async function loadHistory() {
+    const pw = passwordInput.value ? `?password=${passwordInput.value}` : '';
+    const resp = await fetch(`/history/${sessionId}${pw}`);
+    if (!resp.ok) {
+      addMsg('Could not load history (wrong password?)', 'ai');
+      return;
+    }
+    const { history } = await resp.json();
+    chat.innerHTML = '';
+    history.forEach(entry => {
+      addMsg(entry.user, 'user');
+      const aiDiv = addMsg(entry.ai, 'ai');
+      if (entry.audio) {
+        // Optional: show play button for old audio
+      }
+    });
   }
 
   function addMsg(text, sender) {

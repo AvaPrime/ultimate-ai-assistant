@@ -1,98 +1,50 @@
 # Ultimate AI Assistant
 
-A production-ready, voice-enabled, multilingual AI assistant with persistent memory, built with **FastAPI + LangChain + OpenRouter** and deployable to Vercel in one click.
+Full-featured, voice-enabled, multi-model AI assistant with persistent memory, multilingual TTS, and tool use.
 
-## ✨ Features
+## Features
+- **Model Selector**: Switch between GPT-4o, Claude 3.5, Gemini 2.0, Grok-4, Llama 3.3, Qwen 2.5 on the fly.
+- **Voice Input** (OpenAI Whisper)
+- **Voice Output** with speed control + 10 multilingual voices (ElevenLabs)
+- **Auto-translate** non-English input to English for better reasoning
+- **Tools**: Web research (Perplexity), Image generation (Stable Diffusion), Image analysis (Gemini), Email (Resend), Notion database
+- **Persistent Chat History**: Uses Redis (Vercel KV or Upstash) — survives deploys
+- **Password Protection** (optional shared password)
+- **Export** full chat as JSON
 
-- **Unified LLM Gateway**: Powered by OpenRouter (switch between Grok-4, Claude 3.5/4, Gemini 2.0, Llama 4, etc. with one key)
-- **Voice I/O**: Mic input (Whisper) + natural TTS output with **speed control** and **10+ multilingual voices** (ElevenLabs)
-- **Auto-translate**: Any language input is automatically translated to English for the AI
-- **Persistent Chat History**: Redis-backed (works across Vercel deploys)
-- **Export Chats**: Download full conversation + audio as JSON
-- **Extensible Tools**: Research, Image Gen/Analysis, Send Email (Resend), Add to Notion
-- **Optional Password Protection**: Simple shared password gate
-- **Beautiful Streaming UI**: Mobile-friendly, real-time responses
+## Quick Deploy to Vercel
+1. Fork or use the repo
+2. Click **Deploy to Vercel**
+3. Add these Environment Variables in Vercel:
+   - `OPENROUTER_API_KEY` (required)
+   - `PERPLEXITY_API_KEY`, `STABILITY_API_KEY`, `GEMINI_API_KEY`, `OPENAI_API_KEY`, `ELEVEN_API_KEY`
+   - `REDIS_URL` or `UPSTASH_REDIS_URL` (for persistent history — recommended, free tier available)
+   - `RESEND_API_KEY`, `NOTION_API_KEY` (optional tools)
+   - `ACCESS_PASSWORD` (optional)
+   - `DEFAULT_MODEL` (optional, e.g. `anthropic/claude-3.5-sonnet`)
 
-## 🚀 One-Click Deploy to Vercel
+## Model Selector
+The UI now has a **Model** dropdown at the top. Changing it instantly uses that model for the next message via OpenRouter (no restart needed).
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FAvaPrime%2Fultimate-ai-assistant)
+## Persistent Storage (Vercel KV / Redis)
+- Set `REDIS_URL` in Vercel (create a KV store in Vercel Dashboard → Storage → KV)
+- History is saved per session ID (stored in browser localStorage)
+- Click **Load History** to restore previous conversation
 
-Or manually:
-1. Import repo at [vercel.com/new](https://vercel.com/new)
-2. Add the Environment Variables listed below
-3. Deploy
+## Error Handling & Logging
+- All agent errors are caught and shown in chat
+- Server logs visible in Vercel Function Logs
+- Redis failures gracefully fall back to /tmp file storage
 
-## Required Environment Variables (Vercel / .env)
-
-| Variable | Purpose | Required |
-|----------|---------|----------|
-| `OPENROUTER_API_KEY` | Main LLM (Grok/Claude/Gemini/etc.) | Yes |
-| `PERPLEXITY_API_KEY` | Real-time research | Yes |
-| `STABILITY_API_KEY` | Image generation | Yes |
-| `GEMINI_API_KEY` | Image analysis | Yes |
-| `OPENAI_API_KEY` | Whisper speech-to-text | Yes |
-| `ELEVEN_API_KEY` | High-quality TTS (multilingual) | Yes |
-| `REDIS_URL` or `UPSTASH_REDIS_URL` | Persistent chat history | Recommended |
-| `RESEND_API_KEY` | Send emails via tool | Optional |
-| `NOTION_API_KEY` | Add pages to Notion DB | Optional |
-| `ACCESS_PASSWORD` | Simple shared password protection | Optional |
-
-## Setup Persistent Chat History with Upstash Redis (Free)
-
-1. Go to [upstash.com](https://upstash.com) → Create Redis database (free tier)
-2. Copy the `UPSTASH_REDIS_URL` (starts with `rediss://`)
-3. Add it to Vercel Environment Variables as `REDIS_URL`
-4. Chat history will now persist across deploys and restarts.
-
-## Optional: User Authentication
-
-Set `ACCESS_PASSWORD` environment variable. The UI will prompt for the password on first load. All API calls include it. This is a simple shared-password protection suitable for personal/team use.
-
-For production-grade auth, integrate **Clerk** or **Supabase Auth** (both have excellent Vercel templates).
-
-## Custom Domain Setup Guide
-
-1. In Vercel Dashboard → Your Project → **Domains**
-2. Add your domain (e.g. `assistant.yourdomain.com`)
-3. Follow Vercel's DNS instructions (usually add a CNAME record)
-4. Wait for SSL certificate to provision (automatic)
-5. Update any hardcoded URLs if needed (the app is relative-path friendly)
-
-## Adding More Tools (Calendar, Email, Notion, etc.)
-
-New tools are easy to add:
-
-1. Create `ultimate_assistant/tools/your_tool.py` with a `@tool` decorated function
-2. Export it in `tools/__init__.py`
-3. Import and add it to the `tools` list in `agent.py`
-
-**Already included**:
-- `send_email(to, subject, body)` — via Resend
-- `add_to_notion_database(title, content, database_id)` — via Notion API
-
-**For Google Calendar / Gmail**:
-- Use the official Google APIs with service account credentials (store JSON in env or Vercel)
-- Or use MCP servers for desktop integration
-
-## Local Development
-
+## Local Run
 ```bash
-git clone https://github.com/AvaPrime/ultimate-ai-assistant.git
-cd ultimate-ai-assistant
 pip install -r requirements.txt
-cp .env.example .env
-# Add your keys to .env
-python -m ultimate_assistant
+uvicorn ultimate_assistant.api:app --reload
 ```
 
-Then open http://localhost:8000
+Open http://localhost:8000
 
-## Architecture
+## Tech Stack
+FastAPI + LangChain + OpenRouter + Redis + ElevenLabs + Whisper
 
-- `api.py` – FastAPI backend + beautiful voice UI + streaming + Redis chat
-- `agent.py` – LangChain ReAct agent with OpenRouter
-- `tools/` – Modular, plug-and-play tools
-- `config.py` – All secrets and settings
-
-## License
-MIT — Feel free to fork and customize.
+Built with ❤️ for maximum capability in one clean interface.
