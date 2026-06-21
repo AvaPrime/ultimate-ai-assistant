@@ -24,10 +24,21 @@ if config.redis_url:
     except Exception as e:
         print(f"Redis connection failed: {e}")
 
-HISTORY_DIR = Path("/tmp/chat_history")  # Fallback for local / no Redis
+HISTORY_DIR = Path("/tmp/chat_history")
 HISTORY_DIR.mkdir(exist_ok=True)
 
-VOICES = { ... same as before ... }
+VOICES = {
+    "rachel": {"id": "21m00Tcm4TlvDq8ikWAM", "name": "Rachel (EN)"},
+    "antoni": {"id": "ErXwobaYiN019PkySvjV", "name": "Antoni (EN)"},
+    "pablo":  {"id": "pNInz6obpgDQGcFmaJgB", "name": "Pablo (ES)"},
+    "isabella": {"id": "AZpi6D2D7e6D6rD8lB3M", "name": "Isabella (ES)"},
+    "thomas":  {"id": "GBv7mTt0atIp3Br8iC1J", "name": "Thomas (FR)"},
+    "claire":  {"id": "g5Ciwnk5IM4p1n9qM7vL", "name": "Claire (FR)"},
+    "hans":    {"id": "VR3W4z3z3z3z3z3z3z3z", "name": "Hans (DE)"},
+    "anna":    {"id": "EXAVITQu4vr4xnSDxMaL", "name": "Anna (DE)"},
+    "li":      {"id": "IKne3meIYcWjH8u1tKkJ", "name": "Li (ZH)"},
+    "yuki":    {"id": "TxGEqnHWrfWFTfGW9XjX", "name": "Yuki (JA)"}
+}
 
 # Password protection (optional)
 def check_password(pw: str):
@@ -67,7 +78,7 @@ def load_chat(session_id: str):
             return json.loads(file.read_text())
         return []
 
-# === Translate, TTS, Stream (same as before, with password) ===
+# === Translate, TTS, Stream ===
 def translate_to_en(text: str) -> str:
     try:
         detected = GoogleTranslator(source='auto', target='en').detect(text)
@@ -117,7 +128,6 @@ async def ask(request: Request):
         media_type="text/event-stream"
     )
 
-# Keep /transcribe and /export similar, with password check on export
 @app.post("/transcribe")
 async def transcribe(audio: str = Form(...)):
     b64_data = audio.split(",", 1)[1]
