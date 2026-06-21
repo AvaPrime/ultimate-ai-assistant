@@ -1,5 +1,5 @@
 # ultimate_assistant/api.py
-# Full production version with all requested features: sidebar history, Google Calendar, voice cloning, dark mode support, rate limiting, logging
+# Production-ready with all advanced features: sidebar history, Google Calendar, voice cloning, dark mode support, rate limiting, logging
 
 import os
 import json
